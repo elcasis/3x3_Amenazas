@@ -1,0 +1,1024 @@
+$destDir = "C:\Users\elcas\Desktop\Apps_Clase\3x3\Amena_ciberespacio"
+if (!(Test-Path -Path $destDir)) { New-Item -ItemType Directory -Path $destDir -Force }
+
+# Crear index.html
+@'
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
+  <meta name="theme-color" content="#000000">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>CyberSec OLED Quiz & Repaso 3x3</title>
+  <style>
+    :root {
+      --bg-oled: #000000;
+      --card-bg: #0a0a0a;
+      --card-border: #1c1c1c;
+      --text-primary: #f0f0f0;
+      --text-secondary: #9e9e9e;
+      --text-muted: #666666;
+      --accent-cyan: #00e5ff;
+      --accent-green: #00ff88;
+      --accent-red: #ff3344;
+      --accent-purple: #bd00ff;
+      --accent-yellow: #ffea00;
+      --font-scale: 17px;
+      --btn-min-height: 52px;
+      --radius: 14px;
+      --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    body.extreme-contrast {
+      --bg-oled: #000000 !important;
+      --card-bg: #000000 !important;
+      --card-border: #ffffff !important;
+      --text-primary: #ffffff !important;
+      --text-secondary: #ffff00 !important;
+      --text-muted: #ffffaa !important;
+      --accent-cyan: #ffff00 !important;
+      --accent-green: #00ff00 !important;
+      --accent-red: #ff0033 !important;
+      --accent-purple: #ffff00 !important;
+      --accent-yellow: #ffff00 !important;
+    }
+    body.extreme-contrast .card,
+    body.extreme-contrast .opt-btn,
+    body.extreme-contrast .top-btn,
+    body.extreme-contrast .nav-btn {
+      border: 2px solid #ffffff !important;
+      font-weight: 700 !important;
+    }
+    body.extreme-contrast .opt-btn.correct {
+      border-color: #00ff00 !important;
+      background: #003300 !important;
+      color: #00ff00 !important;
+    }
+    body.extreme-contrast .opt-btn.wrong {
+      border-color: #ff0033 !important;
+      background: #330000 !important;
+      color: #ff5555 !important;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html, body {
+      background-color: var(--bg-oled);
+      color: var(--text-primary);
+      font-family: var(--font-family);
+      font-size: var(--font-scale);
+      line-height: 1.5;
+      min-height: 100vh;
+      width: 100%;
+      overflow-x: hidden;
+    }
+    body {
+      padding-top: max(env(safe-area-inset-top), 12px);
+      padding-bottom: calc(75px + env(safe-area-inset-bottom));
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .container { width: 100%; max-width: 580px; padding: 0 16px; }
+    header {
+      width: 100%; max-width: 580px; padding: 12px 16px 8px 16px;
+      display: flex; justify-content: space-between; align-items: center;
+      border-bottom: 1px solid var(--card-border); margin-bottom: 14px;
+    }
+    .logo-badge { display: flex; align-items: center; gap: 8px; }
+    .logo-badge h1 { font-size: 1.15rem; font-weight: 800; color: #ffffff; }
+    .logo-badge span {
+      font-size: 0.65rem; padding: 2px 6px; background: #111;
+      border: 1px solid var(--accent-cyan); color: var(--accent-cyan);
+      border-radius: 6px; text-transform: uppercase; font-weight: bold;
+    }
+    .header-controls { display: flex; align-items: center; gap: 8px; }
+    .top-btn {
+      background-color: #0d0d0d; border: 1px solid var(--card-border);
+      color: var(--text-primary); padding: 6px 12px; border-radius: 8px;
+      font-size: 0.85rem; font-weight: 700; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      min-height: 40px; transition: all 0.2s ease;
+    }
+    .top-btn:active { transform: scale(0.95); background: #1a1a1a; }
+    .font-btn { color: var(--accent-cyan); border-color: #222; min-width: 54px; }
+    .contrast-btn.active { background: #ffff00; color: #000000; border-color: #ffff00; }
+    .tab-content { display: none; animation: fadeIn 0.25s ease-in-out; }
+    .tab-content.active { display: block; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .theme-selector { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+    .theme-tab-btn {
+      background: #0d0d0d; border: 1px solid var(--card-border);
+      color: var(--text-secondary); padding: 12px 8px; border-radius: var(--radius);
+      font-size: 0.85rem; font-weight: 700; cursor: pointer; text-align: center;
+      transition: all 0.2s ease;
+    }
+    .theme-tab-btn.active {
+      background: #141414; color: #ffffff; border-color: var(--accent-cyan);
+      box-shadow: 0 0 10px rgba(0, 229, 255, 0.15);
+    }
+    .pillar-card {
+      background-color: var(--card-bg); border: 1px solid var(--card-border);
+      border-radius: var(--radius); margin-bottom: 16px; overflow: hidden;
+    }
+    .pillar-header {
+      padding: 14px 16px; background: #0f0f0f; border-bottom: 1px solid var(--card-border);
+      display: flex; align-items: center; gap: 10px;
+    }
+    .pillar-num {
+      width: 28px; height: 28px; background: #1c1c1c; border: 1px solid var(--accent-cyan);
+      color: var(--accent-cyan); border-radius: 50%; display: flex; align-items: center;
+      justify-content: center; font-weight: 800; font-size: 0.85rem; flex-shrink: 0;
+    }
+    .pillar-title { font-size: 1rem; font-weight: 700; color: #ffffff; }
+    .subtopics-list { padding: 12px 16px; display: flex; flex-direction: column; gap: 12px; }
+    .subtopic-item {
+      padding: 10px 12px; background: #050505; border-left: 3px solid var(--accent-cyan);
+      border-radius: 4px 8px 8px 4px;
+    }
+    .subtopic-name { font-size: 0.95rem; font-weight: 700; color: #ffffff; margin-bottom: 4px; }
+    .subtopic-desc { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.45; }
+    .quick-start-quiz {
+      width: 100%; background: #111; border: 1px solid var(--accent-green);
+      color: var(--accent-green); padding: 14px; border-radius: var(--radius);
+      font-size: 0.95rem; font-weight: bold; cursor: pointer; margin-top: 10px;
+      margin-bottom: 24px; display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .quick-start-quiz:active { transform: scale(0.98); background: #002914; }
+    .quiz-mode-select { display: flex; flex-direction: column; gap: 12px; }
+    .mode-card {
+      background: var(--card-bg); border: 1px solid var(--card-border);
+      border-radius: var(--radius); padding: 16px; cursor: pointer;
+      display: flex; align-items: center; gap: 14px; transition: all 0.2s ease;
+      min-height: var(--btn-min-height);
+    }
+    .mode-card:active { transform: scale(0.98); border-color: var(--accent-cyan); }
+    .mode-icon { font-size: 1.8rem; flex-shrink: 0; }
+    .mode-info h3 { font-size: 1rem; color: #ffffff; margin-bottom: 2px; }
+    .mode-info p { font-size: 0.8rem; color: var(--text-secondary); }
+    .game-screen { display: none; }
+    .game-stats-bar {
+      display: flex; justify-content: space-between; align-items: center;
+      background: #0d0d0d; border: 1px solid var(--card-border); border-radius: 10px;
+      padding: 8px 14px; margin-bottom: 12px; font-size: 0.85rem;
+    }
+    .stat-pill { display: flex; align-items: center; gap: 5px; font-weight: 700; }
+    .stat-streak { color: var(--accent-yellow); }
+    .stat-score { color: var(--accent-green); }
+    .progress-track {
+      width: 100%; height: 6px; background: #181818; border-radius: 3px;
+      overflow: hidden; margin-bottom: 16px;
+    }
+    .progress-fill {
+      height: 100%; background: linear-gradient(90deg, var(--accent-cyan), var(--accent-green));
+      width: 0%; transition: width 0.3s ease;
+    }
+    .question-card {
+      background: var(--card-bg); border: 1px solid var(--card-border);
+      border-radius: var(--radius); padding: 18px 16px; margin-bottom: 16px;
+    }
+    .question-badge {
+      display: inline-block; font-size: 0.72rem; font-weight: 800;
+      color: var(--accent-cyan); text-transform: uppercase; margin-bottom: 8px;
+    }
+    .question-text { font-size: 1.05rem; font-weight: 700; color: #ffffff; line-height: 1.4; }
+    .options-grid { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+    .opt-btn {
+      width: 100%; min-height: var(--btn-min-height); background: #0d0d0d;
+      border: 1px solid var(--card-border); color: var(--text-primary);
+      padding: 12px 14px; border-radius: var(--radius); font-size: 0.92rem;
+      font-family: inherit; text-align: left; cursor: pointer;
+      display: flex; align-items: flex-start; gap: 12px; transition: all 0.15s ease;
+      line-height: 1.35;
+    }
+    .opt-btn:active:not(:disabled) { background: #1a1a1a; transform: scale(0.98); }
+    .opt-letter {
+      background: #1e1e1e; border: 1px solid #333; color: #ffffff;
+      width: 24px; height: 24px; border-radius: 6px; display: flex;
+      align-items: center; justify-content: center; font-size: 0.75rem;
+      font-weight: 800; flex-shrink: 0; margin-top: 1px;
+    }
+    .opt-btn.correct { background: #032010 !important; border-color: var(--accent-green) !important; color: #ffffff !important; }
+    .opt-btn.correct .opt-letter { background: var(--accent-green); color: #000; border-color: var(--accent-green); }
+    .opt-btn.wrong { background: #250608 !important; border-color: var(--accent-red) !important; color: #ffffff !important; opacity: 0.85; }
+    .opt-btn.wrong .opt-letter { background: var(--accent-red); color: #fff; border-color: var(--accent-red); }
+    .opt-btn:disabled { cursor: default; }
+    .feedback-box {
+      display: none; background: #0a0a0a; border-radius: var(--radius);
+      padding: 14px; margin-bottom: 18px; animation: fadeIn 0.2s ease-in-out;
+      border-left: 4px solid var(--accent-cyan);
+    }
+    .feedback-box.is-correct { border-color: var(--accent-green); background: #02140a; }
+    .feedback-box.is-wrong { border-color: var(--accent-red); background: #160305; }
+    .feedback-title { font-size: 0.95rem; font-weight: 800; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+    .feedback-desc { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.45; }
+    .next-btn {
+      width: 100%; min-height: var(--btn-min-height); background: #ffffff;
+      color: #000000; border: none; border-radius: var(--radius);
+      font-size: 1rem; font-weight: 800; cursor: pointer; display: flex;
+      align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 14px rgba(255, 255, 255, 0.2);
+    }
+    .next-btn:active { transform: scale(0.97); background: #dd; }
+    .result-screen { display: none; text-align: center; padding: 20px 10px; }
+    .result-trophy { font-size: 3.5rem; margin-bottom: 10px; }
+    .result-title { font-size: 1.4rem; font-weight: 800; color: #ffffff; margin-bottom: 6px; }
+    .result-rank {
+      display: inline-block; font-size: 0.85rem; font-weight: 800;
+      color: var(--accent-cyan); border: 1px solid var(--accent-cyan);
+      padding: 4px 12px; border-radius: 20px; margin-bottom: 18px; background: #00121a;
+    }
+    .score-circle {
+      width: 120px; height: 120px; border-radius: 50%; border: 4px solid var(--accent-green);
+      margin: 0 auto 20px auto; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; background: #041208;
+    }
+    .score-number { font-size: 2.2rem; font-weight: 900; color: #ffffff; line-height: 1; }
+    .score-max { font-size: 0.8rem; color: var(--text-secondary); }
+    .result-breakdown {
+      background: var(--card-bg); border: 1px solid var(--card-border);
+      border-radius: var(--radius); padding: 16px; margin-bottom: 20px;
+      display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; text-align: center;
+    }
+    .breakdown-val { font-size: 1.2rem; font-weight: 800; color: #ffffff; }
+    .breakdown-lbl { font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase; }
+    .result-actions { display: flex; flex-direction: column; gap: 10px; }
+    nav.bottom-nav {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      height: calc(62px + env(safe-area-inset-bottom));
+      padding-bottom: env(safe-area-inset-bottom);
+      background: #000000; border-top: 1px solid var(--card-border);
+      display: flex; justify-content: space-around; align-items: center;
+      z-index: 100; max-width: 580px; margin: 0 auto;
+    }
+    .nav-btn {
+      flex: 1; height: 100%; background: none; border: none;
+      color: var(--text-muted); display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 4px;
+      font-size: 0.72rem; font-weight: 700; cursor: pointer; transition: color 0.15s ease;
+    }
+    .nav-btn svg { width: 22px; height: 22px; fill: currentColor; }
+    .nav-btn.active { color: var(--accent-cyan); }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo-badge"><h1>CyberSec</h1><span>OLED</span></div>
+    <div class="header-controls">
+      <button id="fontBtn" class="top-btn font-btn" title="Tamaño de letra">A</button>
+      <button id="contrastBtn" class="top-btn contrast-btn" title="Contraste Extremo">⚡ HC</button>
+      <button id="soundBtn" class="top-btn" title="Sonido">🔊</button>
+    </div>
+  </header>
+  <div class="container">
+    <section id="tabStudy" class="tab-content active">
+      <div class="theme-selector">
+        <button id="btnStudyT1" class="theme-tab-btn active" onclick="switchStudyTheme(1)">Tema 1: Ciberamenazas</button>
+        <button id="btnStudyT2" class="theme-tab-btn" onclick="switchStudyTheme(2)">Tema 2: Internet Oscura</button>
+      </div>
+      <div id="contentTheme1">
+        <div class="pillar-card">
+          <div class="pillar-header"><div class="pillar-num">1</div><div class="pillar-title">Tríada del Riesgo y su Flujo</div></div>
+          <div class="subtopics-list">
+            <div class="subtopic-item">
+              <div class="subtopic-name">1.1. El Flujo de Seguridad</div>
+              <div class="subtopic-desc">Cadena fundamental: <strong>Amenaza</strong> &rarr; explota la <strong>Vulnerabilidad</strong> &rarr; afecta al <strong>Activo</strong> &rarr; provoca un <strong>Impacto</strong>.</div>
+            </div>
+            <div class="subtopic-item">
+              <div class="subtopic-name">1.2. Activo vs. Vulnerabilidad</div>
+              <div class="subtopic-desc">El <strong>activo</strong> es el recurso esencial cuya pérdida genera coste. La <strong>vulnerabilidad</strong> es el fallo de diseño, configuración o implementación (<em>bug</em> explotable).</div>
+            </div>
+            <div class="subtopic-item">
+              <div class="subtopic-name">1.3. Riesgo Inherente y Residual</div>
+              <div class="subtopic-desc">Estimación de <strong>probabilidad &times; impacto</strong>. Riesgo previo a defensas es el <em>inherente</em>; tras aplicar controles y salvaguardas queda el <em>residual</em> (a asumir o externalizar).</div>
+            </div>
+          </div>
+        </div>
+        <div class="pillar-card">
+          <div class="pillar-header"><div class="pillar-num">2</div><div class="pillar-title">Panorama, Actores y Estrategia</div></div>
+          <div class="subtopics-list">
+            <div class="subtopic-item">
+              <div class="subtopic-name">2.1. Criterios de Evaluación (ENISA)</div>
+              <div class="subtopic-desc">La relevancia de las ciberamenazas en los informes anuales ETL se determina conjugando su <strong>frecuencia</strong> y su <strong>impacto</strong>.</div>
+            </div>
+            <div class="subtopic-item">
+              <div class="subtopic-name">2.2. Escala de Sofisticación y Motivación</div>
+              <div class="subtopic-desc">Desde ciberdelincuentes comunes (lucro rápido, ransomware) hasta <strong>APT</strong> (espionaje industrial, robo de IP) y <strong>Estados-nación</strong> (cibersabotaje y disrupción crítica).</div>
+            </div>
+            <div class="subtopic-item">
+              <div class="subtopic-name">2.3. Estrategia Empresarial Adaptada</div>
+              <div class="subtopic-desc">Ante amenazas masivas/comunes se aplica <em>prevenir, detectar y reaccionar</em>. Ante APTs y ataques estatales la prioridad es <strong>detectar y reaccionar velozmente</strong>.</div>
+            </div>
+          </div>
+        </div>
+        <div class="pillar-card">
+          <div class="pillar-header"><div class="pillar-num">3</div><div class="pillar-title">Ciberinteligencia y Colaboración</div></div>
+          <div class="subtopics-list">
+            <div class="subtopic-item">
+              <div class="subtopic-name">3.1. Niveles de Threat Intelligence</div>
+              <div class="subtopic-desc"><strong>Estratégica</strong> (dirección, tendencias geopolíticas), <strong>Operativa/Técnica</strong> (campañas, malware, forense) y <strong>Táctica</strong> (tiempo real, firmas e IoC).</div>
+            </div>
+            <div class="subtopic-item">
+              <div class="subtopic-name">3.2. Atributos de la Inteligencia de Valor</div>
+              <div class="subtopic-desc">Para ser útil, la inteligencia debe ser obligatoriamente: <strong>Oportuna</strong>, <strong>Precisa</strong>, <strong>Procesable</strong> y <strong>Relevante</strong>.</div>
+            </div>
+            <div class="subtopic-item">
+              <div class="subtopic-name">3.3. Intercambio Colaborativo (STIX/TAXII)</div>
+              <div class="subtopic-desc">Compartir patrones de ataque mediante estándares legibles por máquinas (STIX/TAXII, CCN-LUCIA) para anticipar defensas colectivas y recortar tiempos de respuesta.</div>
+            </div>
+          </div>
+        </div>
+        <button class="quick-start-quiz" onclick="startQuizForTheme(1)"><span>⚡ Entrenar Preguntas del Tema 1 (10 Tests)</span></button>
+      </div>
+      <div id="contentTheme2" style="display: none;">
+        <div class="pillar-card">
+          <div class="pillar-header"><div class="pillar-num">1</div><div class="pillar-title">Surface, Deep y Dark Web</div></div>
+          <div class="subtopics-list">
+            <div class="subtopic-item">
+              <div class="subtopic-name">1.1. Deep Web (Legítima y No Indexada)</div>
+              <div class="subtopic-desc">Recursos no indexados por buscadores comunes (bases de datos, correos, intranets privadas) que exigen autenticación, sin ser ilícitos ni peligrosos por sí mismos.</div>
+            </div>
+            <div class="subtopic-item">
+              <div class="subtopic-name">1.2. Dark Web (Capa Oculta Superpuesta)</div>
+              <div class="subtopic-desc">Fracción restringida dentro de la Deep Web que exige software específico (como Tor) para acceder. Usada tanto para actividades ilícitas como para burlar la censura política.</div>
+            </div>
+            <div class="subtopic-item">
+              <div class="subtopic-name">1.3. Mecanismos de Acceso e Indexación</div>
+              <div class="subtopic-desc">La Surface Web usa DNS e indexadores convencionales; la Dark Web depende de redes superpuestas (<em>overlays</em>), circuitos criptográficos y herramientas especializadas.</div>
+            </div>
+          </div>
+        </div>
+        <div class="pillar-card">
+          <div class="pillar-header"><div class="pillar-num">2</div><div class="pillar-title">Red Tor y Onion Routing</div></div>
+          <div class="subtopics-list">
+            <div class="subtopic-item">
+              <div class="subtopic-name">2.1. Cifrado en Capas Sucesivas</div>
+              <div class="subtopic-desc">El tráfico pasa por tres nodos (entrada, intermedio, salida). Cada nodo descifra solo su capa de encriptación para que ninguno conozca simultáneamente origen y destino.</div>
+            </div>
+            <div class="subtopic-item">
+              <div class="subtopic-name">2.2. Servicios Ocultos (.onion)</div>
+              <div class="subtopic-desc">Identificados mediante hashes criptográficos con sufijo <code>.onion</code> (sin DNS central). Garantizan el anonimato bidireccional de cliente y servidor.</div>
+            </div>
+            <div class="subtopic-item">
+              <div class="subtopic-name">2.3. Compromiso Anonimato vs. Velocidad</div>
+              <div class="subtopic-desc">Es la red más extendida y anónima, pero su principal desventaja es la lentitud por la acumulación de demoras en cada salto voluntario.</div>
+            </div>
+          </div>
+        </div>
+        <div class="pillar-card">
+          <div class="pillar-header"><div class="pillar-num">3</div><div class="pillar-title">Redes Alternativas: ZeroNet, I2P, Freenet</div></div>
+          <div class="subtopics-list">
+            <div class="subtopic-item">
+              <div class="subtopic-name">3.1. ZeroNet (P2P + BitTorrent + Bitcoin)</div>
+              <div class="subtopic-desc">Aloja sitios en los discos locales de los visitantes; se propaga exponencialmente y no puede censurarse mientras haya seeders. No es anónima de forma nativa sin Tor.</div>
+            </div>
+            <div class="subtopic-item">
+              <div class="subtopic-name">3.2. I2P (Garlic Routing y Tráfico Interno)</div>
+              <div class="subtopic-desc">Usa enrutamiento ajo (4 capas agrupando mensajes) y DHT Kademlia. El tráfico nunca sale al Internet visible. Vulnerable a ataques <strong>Sybil</strong> en P2P.</div>
+            </div>
+            <div class="subtopic-item">
+              <div class="subtopic-name">3.3. Freenet (Almacenamiento y Riesgo Legal)</div>
+              <div class="subtopic-desc">Los nodos ceden disco local para fragmentos cifrados ajenos (claves CHK de 32 kB). Puede suponer riesgo legal al hospedar pasivamente contenido ilícito.</div>
+            </div>
+          </div>
+        </div>
+        <button class="quick-start-quiz" onclick="startQuizForTheme(2)"><span>🧅 Entrenar Preguntas del Tema 2 (10 Tests)</span></button>
+      </div>
+    </section>
+    <section id="tabQuiz" class="tab-content">
+      <div id="quizModeSelect" class="quiz-mode-select">
+        <h2 style="font-size: 1.15rem; margin-bottom: 4px; color: #fff;">Desafíos CiberSec</h2>
+        <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 12px;">Preguntas aleatorias sin repetición basadas fielmente en los exámenes oficiales.</p>
+        <div class="mode-card" onclick="initGameSession('tema1')">
+          <div class="mode-icon">🛡️</div>
+          <div class="mode-info"><h3>Tema 1: Ciberamenazas y Riesgos</h3><p>10 preguntas &bull; Tríada, ENISA, Actores y Threat Intel</p></div>
+        </div>
+        <div class="mode-card" onclick="initGameSession('tema2')">
+          <div class="mode-icon">🧅</div>
+          <div class="mode-info"><h3>Tema 2: La Internet Oscura</h3><p>10 preguntas &bull; Tor, I2P, ZeroNet y Freenet</p></div>
+        </div>
+        <div class="mode-card" onclick="initGameSession('mix')">
+          <div class="mode-icon">⚡</div>
+          <div class="mode-info"><h3>Desafío Total Mixto</h3><p>20 preguntas &bull; Evaluación completa de ambos temas</p></div>
+        </div>
+      </div>
+      <div id="gameScreen" class="game-screen">
+        <div class="game-stats-bar">
+          <div class="stat-pill"><span id="gameProgressText">1/10</span></div>
+          <div class="stat-pill stat-streak"><span>🔥 Racha:</span> <span id="gameStreak">0</span></div>
+          <div class="stat-pill stat-score"><span>Puntos:</span> <span id="gameScore">0</span></div>
+        </div>
+        <div class="progress-track"><div id="progressFill" class="progress-fill"></div></div>
+        <div class="question-card">
+          <span id="qCategoryBadge" class="question-badge">TEMA 1</span>
+          <h2 id="qText" class="question-text">Cargando pregunta...</h2>
+        </div>
+        <div id="optionsContainer" class="options-grid"></div>
+        <div id="feedbackBox" class="feedback-box">
+          <div id="feedbackTitle" class="feedback-title">¡Correcto!</div>
+          <p id="feedbackDesc" class="feedback-desc">Explicación oficial...</p>
+        </div>
+        <button id="nextBtn" class="next-btn" style="display: none;" onclick="nextQuestion()"><span>Siguiente Pregunta</span> &rarr;</button>
+      </div>
+      <div id="resultScreen" class="result-screen">
+        <div class="result-trophy" id="resultTrophy">🏆</div>
+        <h2 id="resultTitle" class="result-title">¡Misión Completada!</h2>
+        <div id="resultRank" class="result-rank">Cazador de Amenazas</div>
+        <div class="score-circle">
+          <div id="scoreFinalNum" class="score-number">10</div>
+          <div id="scoreFinalMax" class="score-max">de 10 aciertos</div>
+        </div>
+        <div class="result-breakdown">
+          <div><div id="resHits" class="breakdown-val" style="color: var(--accent-green);">10</div><div class="breakdown-lbl">Aciertos</div></div>
+          <div><div id="resMiss" class="breakdown-val" style="color: var(--accent-red);">0</div><div class="breakdown-lbl">Fallos</div></div>
+          <div><div id="resMaxStreak" class="breakdown-val" style="color: var(--accent-yellow);">10</div><div class="breakdown-lbl">Máx Racha</div></div>
+        </div>
+        <div class="result-actions">
+          <button class="next-btn" onclick="initGameSession(currentQuizMode)">🔄 Repetir (Nuevo Barajado)</button>
+          <button class="top-btn" style="min-height: 48px; border-color: #333;" onclick="showTab('study')">📖 Volver al Repaso 3x3</button>
+        </div>
+      </div>
+    </section>
+  </div>
+  <nav class="bottom-nav">
+    <button id="navStudy" class="nav-btn active" onclick="showTab('study')">
+      <svg viewBox="0 0 24 24"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg>
+      <span>Repaso 3x3</span>
+    </button>
+    <button id="navQuiz" class="nav-btn" onclick="showTab('quiz')">
+      <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 16h-2v-2h2v2zm1.07-7.75l-.9.92C12.45 11.9 12 12.5 12 14h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H7c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.04-.42 1.99-1.07 2.75z"/></svg>
+      <span>Juego Quiz</span>
+    </button>
+  </nav>
+  <script>
+    const QUESTION_BANK = [
+      {
+        id: "T1_Q1", theme: 1, themeName: "Tema 1: Ciberamenazas",
+        question: "Indica cuáles de las siguientes afirmaciones son correctas:",
+        options: [
+          "Los programas de gestión de la seguridad incluyen la gestión del riesgo.",
+          "La gestión del riesgo incluye el desarrollo de programas de gestión de la seguridad para las áreas en las que se encuentran debilidades.",
+          "Los programas de gestión de la seguridad se deben evaluar periódicamente para analizar su efectividad.",
+          "Todas las anteriores."
+        ],
+        correct: 3,
+        explanation: "Todas las afirmaciones son correctas: la gestión de la seguridad y del riesgo están unidas de forma integral, alimentando las mejoras y requiriendo auditoría periódica continua."
+      },
+      {
+        id: "T1_Q2", theme: 1, themeName: "Tema 1: Ciberamenazas",
+        question: "Indica cuáles de las siguientes afirmaciones son correctas:",
+        options: [
+          "En la gestión de los riesgos de seguridad se deben considerar como prioritarias aquellas vulnerabilidades que pueden tener un impacto mayor en términos económicos.",
+          "Todos los riesgos deben llevar a la implantación de controles para su mitigación.",
+          "La fuente de la amenaza en la gestión de riesgos es cada una de las vulnerabilidades.",
+          "Ninguna de las anteriores."
+        ],
+        correct: 3,
+        explanation: "Ninguna es correcta: el riesgo se calcula por probabilidad e impacto combinados; no todos los riesgos se mitigan (algunos se asumen o externalizan); y la vulnerabilidad no es la fuente de la amenaza, sino la brecha que esta explota."
+      },
+      {
+        id: "T1_Q3", theme: 1, themeName: "Tema 1: Ciberamenazas",
+        question: "¿Cuál de las siguientes opciones define mejor una vulnerabilidad en el contexto de la ciberseguridad?",
+        options: [
+          "Un recurso valioso para la organización que debe ser protegido.",
+          "Cualquier circunstancia desfavorable que puede causar consecuencias negativas para los activos.",
+          "Un fallo de programación, configuración o diseño que permite a los atacantes alterar el comportamiento normal de un programa.",
+          "La posibilidad de ocurrencia de una amenaza."
+        ],
+        correct: 2,
+        explanation: "Una vulnerabilidad es específicamente una debilidad o fallo de diseño, configuración o implementación de software (bug) que un atacante puede explotar."
+      },
+      {
+        id: "T1_Q4", theme: 1, themeName: "Tema 1: Ciberamenazas",
+        question: "¿Qué es un activo en el contexto de la gestión de riesgos?",
+        options: [
+          "Un fallo de programación que puede ser explotado por atacantes.",
+          "Un recurso de la organización necesario para el desempeño de la actividad y cuya no disponibilidad o deterioro supone un agravio o coste.",
+          "La posibilidad de que una amenaza ocurra.",
+          "Cualquier circunstancia desfavorable que puede afectar negativamente a los activos."
+        ],
+        correct: 1,
+        explanation: "Un activo es cualquier recurso, bien o información vital para el funcionamiento de la empresa cuya pérdida o degradación ocasiona un perjuicio o coste directo."
+      },
+      {
+        id: "T1_Q5", theme: 1, themeName: "Tema 1: Ciberamenazas",
+        question: "¿Qué se entiende por riesgo en la gestión de la ciberseguridad?",
+        options: [
+          "La evaluación del impacto negativo de una amenaza sobre un activo.",
+          "Un fallo en la implementación de un diseño de software.",
+          "Una estimación de la probabilidad de que se materialice una amenaza y el posible impacto de dicha amenaza.",
+          "El proceso de identificar y mitigar vulnerabilidades en el software."
+        ],
+        correct: 2,
+        explanation: "El riesgo es la estimación formal ponderada entre la probabilidad de ocurrencia de una amenaza y el impacto resultante sobre los activos."
+      },
+      {
+        id: "T1_Q6", theme: 1, themeName: "Tema 1: Ciberamenazas",
+        question: "¿Cuál de las siguientes categorías de ciberincidentes involucra el uso de software malicioso como virus, gusanos o troyanos?",
+        options: [
+          "Ataques de denegación de servicio (DoS).",
+          "Accesos no autorizados.",
+          "Infecciones por malware.",
+          "Uso indebido de recursos."
+        ],
+        correct: 2,
+        explanation: "Las infecciones por malware agrupan todo tipo de código hostil diseñado para infectar o dañar sistemas (virus, gusanos, troyanos, spyware, ransomware)."
+      },
+      {
+        id: "T1_Q7", theme: 1, themeName: "Tema 1: Ciberamenazas",
+        question: "¿Qué factor considera la criticidad y sensibilidad de los sistemas comprometidos al clasificar una amenaza?",
+        options: [
+          "Procedencia de la amenaza.",
+          "Nivel de seguridad de los sistemas afectados.",
+          "Perfil de los usuarios afectados.",
+          "Consecuencias."
+        ],
+        correct: 1,
+        explanation: "El 'Nivel de seguridad de los sistemas afectados' evalúa concretamente la criticidad y confidencialidad de la información y sistemas comprometidos."
+      },
+      {
+        id: "T1_Q8", theme: 1, themeName: "Tema 1: Ciberamenazas",
+        question: "¿Cuál de los siguientes tipos de incidentes se clasifica como contenido abusivo en la taxonomía de ciberincidentes?",
+        options: [
+          "Spam.",
+          "DoS (denegación de servicio).",
+          "Ingeniería social.",
+          "Explotación de vulnerabilidades conocidas."
+        ],
+        correct: 0,
+        explanation: "En la taxonomía estándar de incidentes de seguridad (como la del ENS / CCN-CERT), el Spam se cataloga dentro de 'Contenido abusivo'."
+      },
+      {
+        id: "T1_Q9", theme: 1, themeName: "Tema 1: Ciberamenazas",
+        question: "Indica cuál de las siguientes afirmaciones es cierta:",
+        options: [
+          "Siempre es más importante reducir la probabilidad que el posible impacto al gestionar riesgos.",
+          "La probabilidad de un ataque únicamente depende de la motivación económica de los atacantes.",
+          "El coste de implantar una medida de protección no estará justificado desde el punto de vista de la seguridad, si dicha medida no está vinculada a reducir un riesgo asociado.",
+          "Ninguna de las anteriores."
+        ],
+        correct: 2,
+        explanation: "Principio de rentabilidad y justificación de salvaguardas: un control carece de sentido económico y de seguridad si no está directamente asociado a mitigar un riesgo cuantificado."
+      },
+      {
+        id: "T1_Q10", theme: 1, themeName: "Tema 1: Ciberamenazas",
+        question: "¿Cuál de los siguientes beneficios proporciona el intercambio de información sobre ciberamenazas entre organizaciones?",
+        options: [
+          "Incrementa la carga de trabajo debido al análisis de más datos.",
+          "Permite una defensa más efectiva al compartir patrones de ataque conocidos.",
+          "Dificulta la detección de amenazas internas.",
+          "Reduce la necesidad de soluciones de automatización."
+        ],
+        correct: 1,
+        explanation: "Compartir inteligencia y patrones de ataque (IoC, STIX/TAXII) fortalece la defensa colectiva, anticipando bloqueos antes de que el ataque se replique."
+      },
+      {
+        id: "T2_Q1", theme: 2, themeName: "Tema 2: La Internet Oscura",
+        question: "¿Cuál es la principal diferencia entre la Deep Web y la Dark Web?",
+        options: [
+          "La Deep Web es ilegal, mientras que la Dark Web es legal.",
+          "La Dark Web es una parte específica y más oculta de la Deep Web.",
+          "La Deep Web no requiere autenticación, mientras que la Dark Web sí.",
+          "Ninguna opción es correcta."
+        ],
+        correct: 1,
+        explanation: "La Dark Web es una subcapa intencionalmente oculta dentro de la Deep Web que exige aplicaciones y configuraciones especiales para acceder."
+      },
+      {
+        id: "T2_Q2", theme: 2, themeName: "Tema 2: La Internet Oscura",
+        question: "¿Qué tipo de contenido se encuentra principalmente en la Deep Web?",
+        options: [
+          "Contenido ilegal y peligroso.",
+          "Foros públicos y motores de búsqueda convencionales.",
+          "Bases de datos, archivos académicos, información gubernamental.",
+          "Ninguna opción es correcta."
+        ],
+        correct: 2,
+        explanation: "La inmensa mayoría de la Deep Web es información legítima no indexada por motores públicos: bases de datos, repositorios académicos, registros y webmail."
+      },
+      {
+        id: "T2_Q3", theme: 2, themeName: "Tema 2: La Internet Oscura",
+        question: "¿Qué es Tor y cuál es su objetivo principal?",
+        options: [
+          "Una red descentralizada para compartir archivos.",
+          "Una red para acceder a la Dark Web.",
+          "Una red anónima para preservar la privacidad y el anonimato online.",
+          "Ninguna opción es correcta."
+        ],
+        correct: 2,
+        explanation: "Tor (The Onion Router) fue diseñado fundamentalmente como una red de anonimato para defender la privacidad digital y evitar la trazabilidad de las conexiones."
+      },
+      {
+        id: "T2_Q4", theme: 2, themeName: "Tema 2: La Internet Oscura",
+        question: "¿Qué es ZeroNet y en qué se diferencia de Tor?",
+        options: [
+          "Una red descentralizada con conexión a través de Tor.",
+          "Una red P2P que utiliza criptografía bitcoin.",
+          "Un navegador convencional para acceder a la Deep Web.",
+          "Ninguna opción es correcta."
+        ],
+        correct: 1,
+        explanation: "ZeroNet se basa en arquitectura P2P (BitTorrent) y firmas criptográficas de Bitcoin para alojar webs de forma distribuida en los propios navegantes sin servidores centrales."
+      },
+      {
+        id: "T2_Q5", theme: 2, themeName: "Tema 2: La Internet Oscura",
+        question: "¿Cuál es la principal vulnerabilidad de I2P que se menciona?",
+        options: [
+          "Ataque de denegación de servicio.",
+          "Ataque Sybil que afecta la red P2P.",
+          "Vulnerabilidad en la encriptación de datos.",
+          "Ninguna opción es correcta."
+        ],
+        correct: 1,
+        explanation: "I2P es susceptible al ataque Sybil, donde un adversario crea múltiples identidades simuladas en la red P2P para ganar control o desestabilizar la ruta."
+      },
+      {
+        id: "T2_Q6", theme: 2, themeName: "Tema 2: La Internet Oscura",
+        question: "¿Qué son los freesites en Freenet?",
+        options: [
+          "Páginas web convencionales accesibles desde cualquier navegador.",
+          "Contenido compartido de forma anónima en la red Freenet.",
+          "Sitios web legales y autorizados por las autoridades.",
+          "Ninguna opción es correcta."
+        ],
+        correct: 1,
+        explanation: "Los freesites son sitios web distribuidos estáticamente y almacenados en fragmentos encriptados dentro de los nodos de la red Freenet."
+      },
+      {
+        id: "T2_Q7", theme: 2, themeName: "Tema 2: La Internet Oscura",
+        question: "¿Cuál es la principal desventaja de Tor en términos de velocidad de conexión?",
+        options: [
+          "Conexión rápida en comparación con otros servicios.",
+          "Conexión lenta debido al enrutamiento a través de múltiples nodos.",
+          "Conexión inestable sin garantía de anonimato.",
+          "Ninguna opción es correcta."
+        ],
+        correct: 1,
+        explanation: "El paso secuencial del paquete por múltiples nodos cifrados voluntarios (guard, middle, exit) suma latencias, haciendo la navegación lenta."
+      },
+      {
+        id: "T2_Q8", theme: 2, themeName: "Tema 2: La Internet Oscura",
+        question: "¿Cómo funciona el enrutamiento en Tor?",
+        options: [
+          "Añade capas de cifrado al mensaje en cada nodo.",
+          "Utiliza redes overlay como I2P.",
+          "Requiere autenticación para acceder a la red.",
+          "Ninguna opción es correcta."
+        ],
+        correct: 0,
+        explanation: "Enrutamiento cebolla: se envuelven los paquetes en sucesivas capas criptográficas que cada nodo descifra por turnos al pasar el testigo."
+      },
+      {
+        id: "T2_Q9", theme: 2, themeName: "Tema 2: La Internet Oscura",
+        question: "¿Cómo se accede a la Dark Web?",
+        options: [
+          "A través de cualquier navegador convencional.",
+          "Utilizando redes overlay como Tor.",
+          "Mediante motores de búsqueda como Google.",
+          "Ninguna opción es correcta."
+        ],
+        correct: 1,
+        explanation: "El acceso a la Dark Web requiere necesariamente software específico para redes superpuestas (overlays) tales como Tor Browser o el proxy I2P."
+      },
+      {
+        id: "T2_Q10", theme: 2, themeName: "Tema 2: La Internet Oscura",
+        question: "¿Qué significa I2P y cuál es su función principal?",
+        options: [
+          "Internet to peer, una red descentralizada.",
+          "The Invisible Internet Project, proporciona anonimato en la red.",
+          "Integrated 2-Phase, un sistema de enrutamiento para mejorar la velocidad.",
+          "Ninguna opción es correcta."
+        ],
+        correct: 1,
+        explanation: "I2P significa 'The Invisible Internet Project' y ofrece una capa anónima y cifrada interna de enrutamiento ajo (garlic routing) para comunicaciones P2P."
+      }
+    ];
+
+    const fontSizes = [
+      { label: "--A", size: "13px" },
+      { label: "-A",  size: "15px" },
+      { label: "A",   size: "17px" },
+      { label: "A+",  size: "19px" },
+      { label: "A++", size: "22px" }
+    ];
+    let currentFontIdx = 2;
+
+    const fontBtn = document.getElementById("fontBtn");
+    fontBtn.addEventListener("click", () => {
+      currentFontIdx = (currentFontIdx + 1) % fontSizes.length;
+      applyFontSize();
+      vibrate(25);
+    });
+
+    function applyFontSize() {
+      const current = fontSizes[currentFontIdx];
+      document.documentElement.style.setProperty("--font-scale", current.size);
+      fontBtn.textContent = current.label;
+      localStorage.setItem("cybersec_font_idx", currentFontIdx);
+    }
+
+    const contrastBtn = document.getElementById("contrastBtn");
+    let isExtremeContrast = false;
+    contrastBtn.addEventListener("click", () => {
+      isExtremeContrast = !isExtremeContrast;
+      document.body.classList.toggle("extreme-contrast", isExtremeContrast);
+      contrastBtn.classList.toggle("active", isExtremeContrast);
+      localStorage.setItem("cybersec_contrast", isExtremeContrast ? "1" : "0");
+      vibrate(35);
+    });
+
+    let audioEnabled = true;
+    const soundBtn = document.getElementById("soundBtn");
+    soundBtn.addEventListener("click", () => {
+      audioEnabled = !audioEnabled;
+      soundBtn.textContent = audioEnabled ? "🔊" : "🔇";
+      localStorage.setItem("cybersec_sound", audioEnabled ? "1" : "0");
+    });
+
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    function playBeep(frequency, duration, type = "sine") {
+      if (!audioEnabled || !audioCtx) return;
+      try {
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.value = frequency;
+        gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch (e) {}
+    }
+
+    function soundSuccess() {
+      playBeep(587.33, 0.1, "sine");
+      setTimeout(() => playBeep(880, 0.2, "triangle"), 90);
+    }
+
+    function soundError() {
+      playBeep(180, 0.15, "sawtooth");
+      setTimeout(() => playBeep(130, 0.25, "sawtooth"), 120);
+    }
+
+    function soundComplete() {
+      playBeep(523.25, 0.12);
+      setTimeout(() => playBeep(659.25, 0.12), 120);
+      setTimeout(() => playBeep(783.99, 0.12), 240);
+      setTimeout(() => playBeep(1046.50, 0.35), 360);
+    }
+
+    function vibrate(pattern) {
+      if ("vibrate" in navigator) {
+        try { navigator.vibrate(pattern); } catch(e){}
+      }
+    }
+
+    (function restorePrefs() {
+      const savedFont = localStorage.getItem("cybersec_font_idx");
+      if (savedFont !== null) {
+        currentFontIdx = parseInt(savedFont, 10);
+        applyFontSize();
+      }
+      const savedContrast = localStorage.getItem("cybersec_contrast");
+      if (savedContrast === "1") {
+        isExtremeContrast = true;
+        document.body.classList.add("extreme-contrast");
+        contrastBtn.classList.add("active");
+      }
+      const savedSound = localStorage.getItem("cybersec_sound");
+      if (savedSound === "0") {
+        audioEnabled = false;
+        soundBtn.textContent = "🔇";
+      }
+    })();
+
+    function showTab(tab) {
+      document.querySelectorAll(".tab-content").forEach(el => el.classList.remove("active"));
+      document.querySelectorAll(".nav-btn").forEach(el => el.classList.remove("active"));
+
+      if (tab === "study") {
+        document.getElementById("tabStudy").classList.add("active");
+        document.getElementById("navStudy").classList.add("active");
+      } else {
+        document.getElementById("tabQuiz").classList.add("active");
+        document.getElementById("navQuiz").classList.add("active");
+      }
+      vibrate(20);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function switchStudyTheme(themeNum) {
+      const btn1 = document.getElementById("btnStudyT1");
+      const btn2 = document.getElementById("btnStudyT2");
+      const c1 = document.getElementById("contentTheme1");
+      const c2 = document.getElementById("contentTheme2");
+
+      if (themeNum === 1) {
+        btn1.classList.add("active");
+        btn2.classList.remove("active");
+        c1.style.display = "block";
+        c2.style.display = "none";
+      } else {
+        btn2.classList.add("active");
+        btn1.classList.remove("active");
+        c2.style.display = "block";
+        c1.style.display = "none";
+      }
+      vibrate(15);
+    }
+
+    function startQuizForTheme(themeNum) {
+      showTab("quiz");
+      initGameSession(themeNum === 1 ? "tema1" : "tema2");
+    }
+
+    let currentQuizMode = "tema1";
+    let activeQuestions = [];
+    let currentQIndex = 0;
+    let score = 0;
+    let streak = 0;
+    let maxStreak = 0;
+    let hits = 0;
+    let miss = 0;
+
+    function shuffleArray(array) {
+      const arr = [...array];
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    function initGameSession(mode) {
+      currentQuizMode = mode;
+      let pool = [];
+      if (mode === "tema1") {
+        pool = QUESTION_BANK.filter(q => q.theme === 1);
+      } else if (mode === "tema2") {
+        pool = QUESTION_BANK.filter(q => q.theme === 2);
+      } else {
+        pool = QUESTION_BANK;
+      }
+
+      activeQuestions = shuffleArray(pool);
+      currentQIndex = 0;
+      score = 0;
+      streak = 0;
+      maxStreak = 0;
+      hits = 0;
+      miss = 0;
+
+      document.getElementById("quizModeSelect").style.display = "none";
+      document.getElementById("resultScreen").style.display = "none";
+      document.getElementById("gameScreen").style.display = "block";
+
+      renderQuestion();
+      vibrate(30);
+    }
+
+    function renderQuestion() {
+      const q = activeQuestions[currentQIndex];
+      const total = activeQuestions.length;
+
+      document.getElementById("gameProgressText").textContent = `${currentQIndex + 1}/${total}`;
+      document.getElementById("gameStreak").textContent = streak;
+      document.getElementById("gameScore").textContent = score;
+      document.getElementById("progressFill").style.width = `${((currentQIndex) / total) * 100}%`;
+
+      document.getElementById("feedbackBox").style.display = "none";
+      document.getElementById("nextBtn").style.display = "none";
+
+      document.getElementById("qCategoryBadge").textContent = q.themeName;
+      document.getElementById("qText").textContent = q.question;
+
+      const letters = ["A", "B", "C", "D"];
+      const optionsMapped = q.options.map((text, idx) => ({
+        text,
+        isCorrect: (idx === q.correct)
+      }));
+      const shuffledOptions = shuffleArray(optionsMapped);
+
+      const optContainer = document.getElementById("optionsContainer");
+      optContainer.innerHTML = "";
+
+      shuffledOptions.forEach((opt, idx) => {
+        const btn = document.createElement("button");
+        btn.className = "opt-btn";
+        btn.innerHTML = `<span class="opt-letter">${letters[idx]}</span> <span>${opt.text}</span>`;
+        btn.onclick = () => handleAnswer(btn, opt.isCorrect, q.explanation);
+        optContainer.appendChild(btn);
+      });
+    }
+
+    function handleAnswer(selectedBtn, isCorrect, explanation) {
+      const allBtns = document.querySelectorAll(".opt-btn");
+      allBtns.forEach(b => b.disabled = true);
+
+      const feedbackBox = document.getElementById("feedbackBox");
+      const feedbackTitle = document.getElementById("feedbackTitle");
+      const feedbackDesc = document.getElementById("feedbackDesc");
+
+      if (isCorrect) {
+        selectedBtn.classList.add("correct");
+        hits++;
+        streak++;
+        if (streak > maxStreak) maxStreak = streak;
+        score += 100 + (streak * 20);
+
+        feedbackBox.className = "feedback-box is-correct";
+        feedbackTitle.innerHTML = "✅ ¡Respuesta Correcta!";
+        soundSuccess();
+        vibrate([40, 30, 40]);
+      } else {
+        selectedBtn.classList.add("wrong");
+        miss++;
+        streak = 0;
+
+        allBtns.forEach(b => {
+          if (b.innerText.includes(activeQuestions[currentQIndex].options[activeQuestions[currentQIndex].correct])) {
+            b.classList.add("correct");
+          }
+        });
+
+        feedbackBox.className = "feedback-box is-wrong";
+        feedbackTitle.innerHTML = "❌ Respuesta Incorrecta";
+        soundError();
+        vibrate([120, 60, 120]);
+      }
+
+      document.getElementById("gameStreak").textContent = streak;
+      document.getElementById("gameScore").textContent = score;
+
+      feedbackDesc.textContent = explanation;
+      feedbackBox.style.display = "block";
+      document.getElementById("nextBtn").style.display = "flex";
+
+      window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
+    }
+
+    function nextQuestion() {
+      currentQIndex++;
+      const total = activeQuestions.length;
+      if (currentQIndex < total) {
+        renderQuestion();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      } else {
+        finishGameSession();
+      }
+    }
+
+    function finishGameSession() {
+      document.getElementById("gameScreen").style.display = "none";
+      const resScreen = document.getElementById("resultScreen");
+      resScreen.style.display = "block";
+
+      const total = activeQuestions.length;
+      const pct = Math.round((hits / total) * 100);
+
+      document.getElementById("scoreFinalNum").textContent = hits;
+      document.getElementById("scoreFinalMax").textContent = `de ${total} preguntas (${pct}%)`;
+      document.getElementById("resHits").textContent = hits;
+      document.getElementById("resMiss").textContent = miss;
+      document.getElementById("resMaxStreak").textContent = maxStreak;
+
+      const rankBadge = document.getElementById("resultRank");
+      const trophy = document.getElementById("resultTrophy");
+      const title = document.getElementById("resultTitle");
+
+      if (pct === 100) {
+        trophy.textContent = "👑";
+        title.textContent = "¡Dominio Total CiberSec!";
+        rankBadge.textContent = "Nivel: Maestro Hacker Defensivo";
+        rankBadge.style.borderColor = "var(--accent-green)";
+      } else if (pct >= 80) {
+        trophy.textContent = "🛡️";
+        title.textContent = "¡Excelente Desempeño!";
+        rankBadge.textContent = "Nivel: Cazador de Amenazas Senior";
+        rankBadge.style.borderColor = "var(--accent-cyan)";
+      } else if (pct >= 60) {
+        trophy.textContent = "🔍";
+        title.textContent = "¡Buen Trabajo!";
+        rankBadge.textContent = "Nivel: Analista SOC Junior";
+        rankBadge.style.borderColor = "var(--accent-yellow)";
+      } else {
+        trophy.textContent = "⚠️";
+        title.textContent = "Requiere Refuerzo";
+        rankBadge.textContent = "Nivel: Recluta en Cuarentena";
+        rankBadge.style.borderColor = "var(--accent-red)";
+      }
+
+      soundComplete();
+      vibrate([100, 50, 100, 50, 200]);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  </script>
+</body>
+</html>
+'@ | Out-File -FilePath "$destDir\index.html" -Encoding utf8
+
+Write-Host "✅ Archivo index.html creado con éxito en $destDir"
